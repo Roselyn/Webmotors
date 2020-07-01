@@ -17,10 +17,14 @@ import io.cucumber.java.pt.Dado;
 import io.cucumber.java.pt.E;
 import io.cucumber.java.pt.Então;
 import io.cucumber.java.pt.Quando;
+import pages.MainPage;
+import pages.ResultadoPage;
 
 public class BuscaSteps {
 	
 	private WebDriver driver;
+	private MainPage mainpage;
+	private ResultadoPage resultado;
 	
 	@Dado("que esteja na tela inicial da Webmotors")
 	public void que_esteja_na_tela_inicial_da_Webmotors() {
@@ -37,7 +41,9 @@ public class BuscaSteps {
 		WebDriverWait wait = new WebDriverWait(driver, 20);
 		wait.until(ExpectedConditions.elementToBeClickable(By.id("searchBar")));
 		
-		driver.findElement(By.id("searchBar")).sendKeys(modelo, marca);
+		mainpage = new MainPage(driver);
+		
+		mainpage.escreveBusca(modelo, marca);
 			
 	}
 
@@ -47,7 +53,7 @@ public class BuscaSteps {
 		WebDriverWait wait = new WebDriverWait(driver, 20);
 		wait.until(ExpectedConditions.elementToBeClickable(By.className("SearchBar__results__result")));
 		
-		driver.findElement(By.cssSelector(".SearchBar__results__result")).click();
+		mainpage.clicaOpcao();
 	    
 	}
 
@@ -56,27 +62,29 @@ public class BuscaSteps {
 		
 		FluentWait<WebDriver> wait = new WebDriverWait(driver, 10).withTimeout(Duration.ofSeconds(10)).pollingEvery(Duration.ofSeconds(3)).ignoring(NoSuchElementException.class);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".title-search")));
-		
-		String searchTitle = driver.findElement(By.cssSelector(".title-search")).getText();
+	
+	    String searchTitle = driver.findElement(By.cssSelector(".title-search")).getText();
 		Assert.assertEquals(searchTitle, "Honda City em São Paulo/SP - Novos e Usados");
 		
 	}
 	
 	@E("selecionar a opção Concessionária")
 	public void selecionar_a_opção_Concessionária() {
+		
+		resultado = new ResultadoPage(driver);
 				
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		WebElement Element = driver.findElement(By.xpath("//div[@id='root']/main/div/div[2]/div/div[5]/div[2]/label"));
 		js.executeScript("arguments[0].scrollIntoView();", Element);
 		
-		driver.findElement(By.xpath("//div[@id='root']/main/div/div[2]/div/div[5]/div[2]/label")).click();
-		
+		resultado.clicaConcessionaria();
+				
 	}
 
 	@E("selecionar a opção Loja")
 	public void selecionar_a_opção_Loja() {
 		
-		driver.findElement(By.xpath("//div[@id='root']/main/div/div[2]/div/div[5]/div[3]/label")).click();
+		resultado.clicaLoja();
 	    
 	}
 
@@ -86,7 +94,7 @@ public class BuscaSteps {
 		WebDriverWait wait = new WebDriverWait(driver, 40);
 		wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".FoundCars")));
 	    
-		driver.findElement(By.cssSelector(".FoundCars")).getText();
+		resultado.pegaTotal();
 			    
 	}
 }
